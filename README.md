@@ -44,7 +44,7 @@ Note that the shell script runs all the local training sequentially. To run loca
 
 To evaluate the Pearson Correlation Coefficient (PCC) between the estimated Shapley value and the actual Shapley value, run:
 ```
-python3 plot_PCC_calculator.py --m1 gt+tmc+digfl+fedavg+ka --dataset mnist --scenario noniid
+python3 plot_PCC_calculator.py --m1 gt+tmc+digfl+fedavg+ka
 ```
 The result will be saved in save/Contribution_results/
 
