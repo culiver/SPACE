@@ -14,7 +14,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from typing import List, NamedTuple, Optional, Sequence, Tuple
 
-# from pydvl.value import compute_shapley_values, ShapleyMode
 from pydvl.value.stopping import MaxUpdates
 import cvxpy as cp
 import math

@@ -16,7 +16,7 @@ from utils import get_dataset, average_weights, exp_details, save_json, get_json
 import matplotlib
 import matplotlib.pyplot as plt
 import json
-from utils import contribution_eval, get_subsidy_realshap
+from utils import contribution_eval
 from utilities import stable_sigmoid
 from .central import Central
 
@@ -44,11 +44,6 @@ class TMCShapley(Central):
         )
         self.last_k = 10
         self.converge_criteria = 0.05
-
-
-    def get_subsidy(self):
-        subsidy = get_subsidy_realshap(self.subsets_info, u_trans=self.args.u_trans)
-        self.ckp.write_log("Subsidy of e-core: {}".format(subsidy))
 
     def get_contributions(self,contribution_records, fullset_metric):
         round_shapley_values = np.sum(contribution_records, 0) / len(

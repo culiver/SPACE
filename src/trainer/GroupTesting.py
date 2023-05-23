@@ -16,7 +16,7 @@ from utils import get_dataset, average_weights, exp_details, save_json, get_json
 import matplotlib
 import matplotlib.pyplot as plt
 import json
-from utils import contribution_eval, get_subsidy_realshap
+from utils import contribution_eval
 from utilities import stable_sigmoid
 from .central import Central
 
@@ -37,11 +37,6 @@ T = TypeVar("T", NDArray[np.float_], float)
 class GroupTesting(Central):
     def __init__(self, args, my_model, ckp):
         super().__init__(args, my_model, ckp)
-
-    def get_subsidy(self):
-        subsidy = get_subsidy_realshap(self.subsets_info, u_trans=self.args.u_trans)
-        self.ckp.write_log("Subsidy of e-core: {}".format(subsidy))
-
 
     def get_contributions(self):
         save_json(self.args, 'contributions.json', self.contributions.tolist())
