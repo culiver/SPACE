@@ -15,8 +15,6 @@ import numpy as np
 from typing import List, NamedTuple, Optional, Sequence, Tuple
 
 # from pydvl.value import compute_shapley_values, ShapleyMode
-from pydvl.value.least_core.naive import lc_prepare_problem
-from pydvl.value.least_core.common import _solve_least_core_linear_program
 from pydvl.value.stopping import MaxUpdates
 import cvxpy as cp
 import math
@@ -24,7 +22,6 @@ import random
 
 # Extended pydvl
 from pydvl_extend.shapley.pruned import RelativePruning
-from pydvl_extend.least_core import compute_least_core_values, LeastCoreMode
 from pydvl_extend.shapley import compute_shapley_values, ShapleyMode
 
 from utilities import Utility_Func_cosine, Utility_Func_fid, Utility_Func_RealShap
@@ -406,30 +403,7 @@ def contribution_eval(input_params, metric='cosine', budget=200, solution_concep
     else:
         utility = Utility_Func_cosine(input_params['serverPrototype'], input_params['clientPrototypes'], input_params['client_data_nums'], u_trans=u_trans, k=k, T=T)
 
-    if 'core' in solution_concept:
-        if 'exact' in solution_concept:
-            values = compute_least_core_values(
-                u=utility,
-                mode=LeastCoreMode.Exact,
-                progress=True,
-            )
-        elif 'pruned' in solution_concept:
-            values = compute_least_core_values(
-                u=utility,
-                mode=LeastCoreMode.PrunedMontecarlo,
-                n_iterations=budget,
-                n_jobs=1,
-                pruning=RelativePruning(u=utility, atol=0)
-            )
-        else:
-            values = compute_least_core_values(
-                u=utility,
-                mode=LeastCoreMode.MonteCarlo,
-                n_iterations=budget,
-                n_jobs=1,
-            )
-        return values.values
-    elif 'shapley' in solution_concept:
+    if 'shapley' in solution_concept:
         if 'exact' in solution_concept:
             values = compute_shapley_values(
                 u=utility,
@@ -465,105 +439,3 @@ def contribution_eval(input_params, metric='cosine', budget=200, solution_concep
                 pruning=RelativePruning(u=utility, atol=0.01)
             )
         return values.values
-
-def cal_subsidy(
-    problem,
-    *,
-    u,
-    algorithm: str,
-    non_negative_subsidy: bool = False,
-    solver_options: Optional[dict] = None,
-    **options,
-):
-    """Solves a linear problem prepared by :func:`mclc_prepare_problem`.
-    Useful for parallel execution of multiple experiments by running this as a
-    remote task.
-    See :func:`~pydvl.value.least_core.naive.exact_least_core` or
-    :func:`~pydvl.value.least_core.montecarlo.montecarlo_least_core` for
-    argument descriptions.
-    """
-    n = len(u.data)
-
-    if np.any(np.isnan(problem.utility_values)):
-        warnings.warn(
-            f"Calculation returned "
-            f"{np.sum(np.isnan(problem.utility_values))} NaN "
-            f"values out of {problem.utility_values.size}",
-            RuntimeWarning,
-        )
-
-    # TODO: remove this before releasing version 0.7.0
-    if options:
-        warnings.warn(
-            DeprecationWarning(
-                "Passing solver options as kwargs was deprecated in "
-                "0.6.0, will be removed in 0.7.0. `Use solver_options` "
-                "instead."
-            )
-        )
-        if solver_options is None:
-            solver_options = options
-        else:
-            solver_options.update(options)
-
-    if solver_options is None:
-        solver_options = {}
-
-    if "solver" not in solver_options:
-        solver_options["solver"] = cp.SCS
-
-    if "max_iters" not in solver_options and solver_options["solver"] == cp.SCS:
-        solver_options["max_iters"] = 10000
-
-    b_lb = problem.utility_values
-    A_lb, unique_indices = np.unique(problem.A_lb, return_index=True, axis=0)
-    b_lb = b_lb[unique_indices]
-
-    A_eq = np.ones((1, n))
-    # We might have already computed the total utility one or more times.
-    # This is the index of the row(s) in A_lb with all ones.
-    total_utility_indices = np.where(A_lb.sum(axis=1) == n)[0]
-    if len(total_utility_indices) == 0:
-        b_eq = np.array([u(u.data.indices)])
-    else:
-        b_eq = b_lb[total_utility_indices]
-        # Remove the row(s) corresponding to the total utility
-        # from the lower bound constraints
-        # because given the equality constraint
-        # it is the same as using the constraint e >= 0
-        # (i.e. setting non_negative_subsidy = True).
-        mask = np.ones_like(b_lb, dtype=bool)
-        mask[total_utility_indices] = False
-        b_lb = b_lb[mask]
-        A_lb = A_lb[mask]
-
-    # Remove the row(s) corresponding to the empty subset
-    # because, given u(∅) = (which is almost always the case,
-    # it is the same as using the constraint e >= 0
-    # (i.e. setting non_negative_subsidy = True).
-    emptyset_utility_indices = np.where(A_lb.sum(axis=1) == 0)[0]
-    if len(emptyset_utility_indices) > 0:
-        mask = np.ones_like(b_lb, dtype=bool)
-        mask[emptyset_utility_indices] = False
-        b_lb = b_lb[mask]
-        A_lb = A_lb[mask]
-
-    _, subsidy = _solve_least_core_linear_program(
-        A_eq=A_eq,
-        b_eq=b_eq,
-        A_lb=A_lb,
-        b_lb=b_lb,
-    )
-    return subsidy
-
-def get_subsidy_realshap(subsets_info, u_trans=False):
-    u = Utility_Func_RealShap(subsets_info, u_trans=u_trans)
-    problem = lc_prepare_problem(u)
-    subsidy = cal_subsidy(
-        problem=problem,
-        u=u,
-        algorithm="exact_least_core",
-        non_negative_subsidy=False,
-        solver_options=None,
-    )
-    return subsidy
