@@ -54,8 +54,8 @@ def main(args):
 
                     dataset_keyword = dataset
 
-                    c1_list = [c for c in c1_list if checkString(c, [dataset_keyword, keyword, '_iid[3]', 'iternum[1]'])]
-                    c2_list = [c for c in c2_list if checkString(c, [dataset_keyword, keyword, '_iid[3]', 'iternum[1]'])]
+                    c1_list = [c for c in c1_list if checkString(c, [dataset_keyword, keyword, '_dist[3]', 'iternum[1]'])]
+                    c2_list = [c for c in c2_list if checkString(c, [dataset_keyword, keyword, '_dist[3]', 'iternum[1]'])]
 
                     assert len(c1_list) == len(c2_list), (T, k, method, dataset, scenario, len(c1_list), len(c2_list))
 
