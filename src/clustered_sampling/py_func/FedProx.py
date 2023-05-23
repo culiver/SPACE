@@ -362,7 +362,7 @@ def FedProx_clustered_sampling(
         linkage_matrix = linkage(sim_matrix, "ward")
 
         distri_clusters = get_clusters_with_alg2(
-            linkage_matrix, n_sampled, (beta*contributions+(1-beta)weights)
+            linkage_matrix, n_sampled, (beta*contributions+(1-beta)*weights)
         )
 
 
