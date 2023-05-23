@@ -33,7 +33,6 @@ def plot_acc_curve(args, acc_info, savename, dataset, scenario, axis, data_scena
         else:
             acc_list = np.transpose(acc_list, (1, 0))
             means = np.mean(acc_list, axis=0) * 100
-            print(label, dataset, scenario, max(means-normal_means))
         stds = np.std(acc_list, axis=0) * 100
 
         axis[data_scenario_idx].plot(x, means, label=label, color=color_list[idx])
@@ -66,7 +65,6 @@ def main(args):
         acc_info = {}
         for method in method_list:
             method = method.upper()
-            print(method,dataset,scenario)
             c1_list = sorted(glob.glob(os.path.join(args.root, method+'*', 'reweight_info.json')))
 
             if scenario == 'noniid':
@@ -78,7 +76,7 @@ def main(args):
 
             dataset_keyword = dataset
 
-            c1_list = [c for c in c1_list if checkString(c, [dataset_keyword, keyword, '_iid[3]', 'iternum[5]'])]
+            c1_list = [c for c in c1_list if checkString(c, [dataset_keyword, keyword, '_dist[3]', 'iternum[5]'])]
 
             for file1_path in c1_list:
                 with open(file1_path, 'r') as f:

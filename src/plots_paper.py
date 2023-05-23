@@ -20,4 +20,3 @@ from clustered_sampling.plots_func.Fig_CIFAR10 import plot_fig_CIFAR10_alpha_eff
 
 smooth = True
 plot_fig_CIFAR10_alpha_effect_one('acc', n_SGD, p, mu, smooth)
-plot_fig_CIFAR10_alpha_effect_one('loss', n_SGD, p, mu, smooth)
