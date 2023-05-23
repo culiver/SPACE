@@ -1,111 +1,81 @@
-# Federated-Learning (PyTorch)
-
-Implementation of the vanilla federated learning paper : [Communication-Efficient Learning of Deep Networks from Decentralized Data](https://arxiv.org/abs/1602.05629).
-
-
-Experiments are produced on MNIST, Fashion MNIST and CIFAR10 (both IID and non-IID). In case of non-IID, the data amongst the users can be split equally or unequally.
-
-Since the purpose of these experiments are to illustrate the effectiveness of the federated learning paradigm, only simple models such as MLP and CNN are used.
+# SPACE: Single-round Participant Amalgamation for Contribution Evaluation in Federated Learning
 
 ## Requirments
 Install all the packages from requirments.txt
-* Python3
-* Pytorch
-* Torchvision
 
 ## Data
 * Download train and test datasets manually or they will be automatically downloaded from torchvision datasets.
-* Experiments are run on Mnist, Fashion Mnist and Cifar.
-* To use your own dataset: Move your dataset to data directory and write a wrapper on pytorch dataset class.
+* Experiments are run on Mnist and Cifar.
 
-## Running the experiments
-The baseline experiment trains the model in the conventional way.
+## Quick Start
+We provide shell scripts to run all the approaches mentioned in our paper, except for GTG-Shapley. For the implementation of GTG-Shapley, please refer to https://github.com/liuzelei13/GTG-Shapley.
 
-* To run the baseline experiment with MNIST on MLP using CPU:
+Before running the commands, navigate to the source code directory src/:
 ```
-python src/baseline_main.py --model=mlp --dataset=mnist --epochs=10
-```
-* Or to run it on GPU (eg: if gpu:0 is available):
-```
-python src/baseline_main.py --model=mlp --dataset=mnist --gpu=0 --epochs=10
-```
------
-
-Federated experiment involves training a global model using many local models.
-
-* To run the federated experiment with CIFAR on CNN (IID):
-```
-python src/federated_main.py --model=cnn --dataset=cifar --gpu=0 --dist=1 --epochs=10
-```
-* To run the same experiment under non-IID condition:
-```
-python src/federated_main.py --model=cnn --dataset=cifar --gpu=0 --dist=0 --epochs=10
+cd src
 ```
 
-You can change the default values of other parameters to simulate different conditions. Refer to the options section.
+### Contribution Evaluation
+To calculate the actual Shapley value, run:
+```
+./RealShapley_Contribution_dist3.sh
+```
+For SPACE, run:
+```
+./KA_Contribution_dist3.sh
+```
+For SPACE(Avg), run:
+```
+./FedAvg_Contribution_dist3.sh
+```
+For DIG-FL, run:
+```
+./DIGFL_Contribution_dist3.sh
+```
+For TMC-Shapley, run:
+```
+./TMC_Contribution_dist3.sh
+```
+For Group Testing, run:
+```
+./GT_Contribution_dist3.sh
+```
+Note that the shell script runs all the local training sequentially. To run local training in parallel, add --RPC to the command.
 
-## Options
-The default values for various paramters parsed to the experiment are given in ```options.py```. Details are given some of those parameters:
+To evaluate the Pearson Correlation Coefficient (PCC) between the estimated Shapley value and the actual Shapley value, run:
+```
+python3 plot_PCC_calculator.py --m1 gt+tmc+digfl+fedavg+ka --dataset mnist --scenario noniid
+```
+The result will be saved in save/Contribution_results/
 
-* ```--dataset:```  Default: 'mnist'. Options: 'mnist', 'fmnist', 'cifar'
-* ```--model:```    Default: 'mlp'. Options: 'mlp', 'cnn'
-* ```--gpu:```      Default: None (runs on CPU). Can also be set to the specific gpu id.
-* ```--epochs:```   Number of rounds of training.
-* ```--lr:```       Learning rate set to 0.01 by default.
-* ```--verbose:```  Detailed log outputs. Activated by default, set to 0 to deactivate.
-* ```--seed:```     Random Seed. Default set to 1.
+### Client Reweighting
+For SPACE, run:
+```
+./KA_Contribution_dist3.sh
+```
+For SPACE (Average), run:
+```
+./FedAvg_Contribution_dist3.sh
+```
+For DIG-FL, run:
+```
+./DIGFL_Contribution_dist3.sh
+```
+To plot the reweighting result, run:
+```
+python3 plot_reweighting.py --m1 digfl+fedavg+KA
+```
+The result will be saved in save/Reweighting_results/
+### Client Selection
+For the client selection task, run:
+```
+./KA_Selection.sh
+```
+Note that the default implementation amalgamates 100 clients simultaneously. If there is limited GPU memory capacity, you can change the --t_num parameter to adjust the number of teachers in knowledge amalgamation.
 
-#### Federated Parameters
-* ```--dist:```      Distribution of data amongst users. Default set to IID. Set to 0 for non-IID.
-* ```--num_users:```Number of users. Default is 100.
-* ```--frac:```     Fraction of users to be used for federated updates. Default is 0.1.
-* ```--local_ep:``` Number of local training epochs in each user. Default is 10.
-* ```--local_bs:``` Batch size of local updates in each user. Default is 10.
-* ```--unequal:```  Used in non-iid setting. Option to split the data amongst users equally or unequally. Default set to 0 for equal splits. Set to 1 for unequal splits.
+To plot the result, run:
+```
+python3 plots_paper.py
+```
+The results will be saved in src/clustered_sampling/plots/
 
-## Results on MNIST
-#### Baseline Experiment:
-The experiment involves training a single model in the conventional way.
-
-Parameters: <br />
-* ```Optimizer:```    : SGD 
-* ```Learning Rate:``` 0.01
-
-```Table 1:``` Test accuracy after training for 10 epochs:
-
-| Model | Test Acc |
-| ----- | -----    |
-|  MLP  |  92.71%  |
-|  CNN  |  98.42%  |
-
-----
-
-#### Federated Experiment:
-The experiment involves training a global model in the federated setting.
-
-Federated parameters (default values):
-* ```Fraction of users (C)```: 0.1 
-* ```Local Batch size  (B)```: 10 
-* ```Local Epochs      (E)```: 10 
-* ```Optimizer            ```: SGD 
-* ```Learning Rate        ```: 0.01 <br />
-
-```Table 2:``` Test accuracy after training for 10 global epochs with:
-
-| Model |    IID   | Non-IID (equal)|
-| ----- | -----    |----            |
-|  MLP  |  88.38%  |     73.49%     |
-|  CNN  |  97.28%  |     75.94%     |
-
-
-## Further Readings
-### Papers:
-* [Federated Learning: Challenges, Methods, and Future Directions](https://arxiv.org/abs/1908.07873)
-* [Communication-Efficient Learning of Deep Networks from Decentralized Data](https://arxiv.org/abs/1602.05629)
-* [Deep Learning with Differential Privacy](https://arxiv.org/abs/1607.00133)
-
-### Blog Posts:
-* [CMU MLD Blog Post: Federated Learning: Challenges, Methods, and Future Directions](https://blog.ml.cmu.edu/2019/11/12/federated-learning-challenges-methods-and-future-directions/)
-* [Leaf: A Benchmark for Federated Settings (CMU)](https://leaf.cmu.edu/)
-* [TensorFlow Federated](https://www.tensorflow.org/federated)
-* [Google AI Blog Post](https://ai.googleblog.com/2017/04/federated-learning-collaborative.html)

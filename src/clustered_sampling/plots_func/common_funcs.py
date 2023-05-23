@@ -27,7 +27,6 @@ def get_acc_loss(
         "clustered_SPACE",
     ],
     similarities=["any", "L2", "L1", "cosine", "any", "any", "any", "cosine"],
-    # names_legend=["MD", "L2", "L1", "Alg. 2", "Target", "Alg. 1", "FedAvg", "Alg. 3", "Alg. 4"],
     names_legend=["MD", "L2", "L1", "CS(Alg.2)", "Target", "CS(Alg.1)", "FedAvg", "CS(SPACE)"],
 ):
 

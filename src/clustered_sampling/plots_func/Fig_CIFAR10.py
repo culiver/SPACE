@@ -210,29 +210,23 @@ def metric_evo(
     elif metric == 'acc':
         weights = np.array([1])
 
-    # try:
-    metric_hists, legend = get_acc_loss(
-        dataset, sampling, metric, n_SGD, seed, lr, decay, p, mu
-    )
-
-    print(legend)
-
-    idx_kept = [legend.index(title_simu) for title_simu in kept]
-    metric_hists = [metric_hists[idx] for idx in idx_kept]
-    lx = []
-    for hist in metric_hists:
-        lx.append(
-            plot_hist_mean(hist, weights, axis, idx_row, idx_col, smooth)[0]
+    try:
+        metric_hists, legend = get_acc_loss(
+            dataset, sampling, metric, n_SGD, seed, lr, decay, p, mu
         )
-    # except:
-    #     pass
-    # axis[idx_row, idx_col].set_title(plot_name)
-    # if idx_row == 0 and idx_col == 0:
-    #     axis[idx_row, idx_col].legend(kept, title=r"$\bf{Sampling}$")
-    # if idx_row == n_rows - 1:
-    #     axis[idx_row, idx_col].set_xlabel("# rounds")
-    # if idx_col == 0:
-    #     axis[idx_row, idx_col].set_ylabel("Global Loss")
+
+        print(legend)
+
+        idx_kept = [legend.index(title_simu) for title_simu in kept]
+        metric_hists = [metric_hists[idx] for idx in idx_kept]
+        lx = []
+        for hist in metric_hists:
+            lx.append(
+                plot_hist_mean(hist, weights, axis, idx_row, idx_col, smooth)[0]
+            )
+    except:
+        pass
+
     axis[idx_col].set_title(plot_name)
     if idx_row == 0 and idx_col == 0:
         axis[idx_col].legend(kept, title=r"$\bf{Sampling}$")
@@ -255,8 +249,6 @@ def plot_fig_CIFAR10_alpha_effect_one(
     n_rows, n_cols = 1, 2
     dataset_base = "CIFAR10"
 
-    # fig, axis = plt.subplots(n_rows, n_cols, figsize=(9, 3.7))
-    # fig, axis = plt.subplots(n_rows, n_cols, figsize=(9, 2))
     fig, axis = plt.subplots(n_rows, n_cols, figsize=(9, 3))
 
     # INFLUENCE OF THE NON-IID ASPECT
@@ -349,5 +341,4 @@ def plot_fig_CIFAR10_alpha_effect_one(
     )
 
     plt.tight_layout(pad=0.0)
-    # plt.savefig(f"clustered_sampling/plots/plot_CIFAR_{metric}_custom_lr.pdf")
     plt.savefig(f"clustered_sampling/plots/plot_CIFAR_{metric}_custom_lr.png")
