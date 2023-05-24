@@ -52,18 +52,11 @@ class LocalUpdate(object):
         Returns train, validation and test dataloaders for a given dataset
         and user indexes.
         """
-        # split indexes for train, validation, and test (80, 10, 10)
-        # idxs_train = idxs[:int(0.8*len(idxs))]
-        # idxs_val = idxs[int(0.8*len(idxs)):int(0.9*len(idxs))]
-        # idxs_test = idxs[int(0.9*len(idxs)):]
         idxs_train = idxs[:]
 
         trainloader = DataLoader(DatasetSplit(dataset, idxs_train),
                                  batch_size=self.args.local_bs, shuffle=True)
-        # validloader = DataLoader(DatasetSplit(dataset, idxs_val),
-        #                          batch_size=int(len(idxs_val)/10), shuffle=False)
-        # testloader = DataLoader(DatasetSplit(dataset, idxs_test),
-        #                         batch_size=int(len(idxs_test)/10), shuffle=False)
+
         validloader = None
         testloader = None
         return trainloader, validloader, testloader
@@ -95,8 +88,6 @@ class LocalUpdate(object):
         return sum_grad(hv_s)
 
     def update_weights(self, model, global_round):
-        # if self.args.verbose:
-        # print('Client labels:' + str(np.unique(np.array([d[1] for d in self.trainloader.dataset]))))
         # Set mode to train model
         model.train()
         model.to(self.device)
