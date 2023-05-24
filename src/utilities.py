@@ -91,10 +91,7 @@ class Utility_Func_cosine():
         self.u_trans = u_trans
         self.k = k
         if math.isnan(T):
-            # strongest_individual_value = max([self.scorer([indice]) for indice in self.data.indices])    
-            # full_coalition_value = max(self.scorer(self.data.indices), strongest_individual_value)
             full_coalition_value = self.scorer(self.data.indices)
-            # self.T = (strongest_individual_value + full_coalition_value) / 2
             self.T = full_coalition_value
         else:
             self.T = T
@@ -160,10 +157,7 @@ class Utility_Func_fid():
         self.u_trans = u_trans
         self.k = k
         if math.isnan(T):
-            # strongest_individual_value = max([self.scorer([indice]) for indice in self.data.indices])    
-            # full_coalition_value = max(self.scorer(self.data.indices), strongest_individual_value)
             full_coalition_value = self.scorer(self.data.indices)
-            # self.T = (strongest_individual_value + full_coalition_value) / 2
             self.T = full_coalition_value
         else:
             self.T = T
@@ -237,10 +231,7 @@ class Utility_Func_RealShap():
         self.u_trans = u_trans
         self.k = k
         if math.isnan(T):
-            # strongest_individual_value = max([self.scorer([indice]) for indice in self.data.indices])    
-            # full_coalition_value = max(self.scorer(self.data.indices), strongest_individual_value)
             full_coalition_value = self.scorer(self.data.indices)
-            # self.T = (strongest_individual_value + full_coalition_value) / 2
             self.T = full_coalition_value
         else:
             self.T = T
