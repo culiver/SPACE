@@ -1,12 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
-from clustered_sampling.plots_func.Fig_MNIST_shard import plot_fig_alg2
-
-dataset = "MNIST_shard"
-sampling = "clustered_1"
-# n_SGD = 50
 n_SGD = 100
 seed = 0
 lr = 0.01

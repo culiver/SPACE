@@ -84,9 +84,6 @@ class Model(nn.Module):
             )
 
         if load_from:
-            if 'team03_fmen.pth' in self.args.pre_train:
-                load_from['tail.0.weight'] = load_from['tail.0.weight'][::4]
-                load_from['tail.0.bias'] = load_from['tail.0.bias'][::4]
 
             for name, module in self.model.named_modules():
                 if isinstance(module, torch.nn.Conv2d):

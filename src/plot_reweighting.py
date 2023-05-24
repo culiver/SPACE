@@ -16,7 +16,6 @@ def checkString(s, keyword_list):
 def plot_acc_curve(args, acc_info, savename, dataset, scenario, axis, data_scenario_idx):
     color_list = ['r', 'g', 'b', 'orange']
 
-    # plt.figure()
     x = list(range(0, 100, 20))
 
 
